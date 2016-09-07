@@ -1,0 +1,99 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>ROSREESTR2COORD</title>
+    <meta name=viewport content="width=device-width, initial-scale=1">
+    <meta name="Description" content="Определение координат участка по кадастровому номеру">
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+          integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" href = "https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.2.3/leaflet.draw.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.2.3/images/spritesheet.png"/>
+    <link rel="stylesheet" href ="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.2.3/images/spritesheet-2x.png"/>
+    
+    <link rel="stylesheet" href ="{% static 'pkk/css/pkk.css' %}"/>
+
+</head>
+<body>
+<div class="main container">
+    <div class="page-header">
+        <div class="input-group">
+            <input id="area-code-input" type="text" class="form-control" placeholder="Кадастровый номер">
+{#            <span class="input-group-addon">e</span>#}
+{#            <input id="epsilon-input" type="text" class="form-control" placeholder="Точность аппроксимации">#}
+            <span class="input-group-btn">
+                <button id="get-help" type="button" class="btn btn-default" aria-label="Help">
+                    <span class="glyphicon glyphicon-question-sign"></span>
+                </button>
+                <button id="get-area" class="btn btn-default" type="button">Вперёд</button>
+            </span>
+        </div>
+        <!-- /input-group -->
+    </div>
+    <div id="result" class="row">
+        <div class="map-container col-md-6">
+            <div id="map"></div>
+        </div>
+        <div class="attr-container col-md-6">
+            <div class="alert alert-warning" role="alert">
+                <strong>Внимание!</strong> Полученные данные, не соответствуют кадастровой выписке.
+            </div>
+            <div id="info" class="result-block"></div>
+            <div class="coords result-block">
+                <div id="coord-select"></div>
+                <div id="coord-options"></div>
+                <ul id="coords-list" class="list-group"></ul>           
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <p class="text-muted">rendrom@gmail.com
+            <a href="https://github.com/rendrom/rosreestr2coord" target="_blank">
+                <svg aria-hidden="true" class="octicon octicon-mark-github" height="24" version="1.1" viewBox="0 0 16 16" width="24">
+                    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59 0.4 0.07 0.55-0.17 0.55-0.38 0-0.19-0.01-0.82-0.01-1.49-2.01 0.37-2.53-0.49-2.69-0.94-0.09-0.23-0.48-0.94-0.82-1.13-0.28-0.15-0.68-0.52-0.01-0.53 0.63-0.01 1.08 0.58 1.23 0.82 0.72 1.21 1.87 0.87 2.33 0.66 0.07-0.52 0.28-0.87 0.51-1.07-1.78-0.2-3.64-0.89-3.64-3.95 0-0.87 0.31-1.59 0.82-2.15-0.08-0.2-0.36-1.02 0.08-2.12 0 0 0.67-0.21 2.2 0.82 0.64-0.18 1.32-0.27 2-0.27 0.68 0 1.36 0.09 2 0.27 1.53-1.04 2.2-0.82 2.2-0.82 0.44 1.1 0.16 1.92 0.08 2.12 0.51 0.56 0.82 1.27 0.82 2.15 0 3.07-1.87 3.75-3.65 3.95 0.29 0.25 0.54 0.73 0.54 1.48 0 1.07-0.01 1.93-0.01 2.2 0 0.21 0.15 0.46 0.55 0.38C13.71 14.53 16 11.53 16 8 16 3.58 12.42 0 8 0z"></path>
+                </svg>
+            </a>
+            <a href="http://www.mapbasic.ru/msk-wgs" class="pull-right">msk-wgs</a>
+            <span  class="pull-right">&nbsp;|&nbsp;</span>
+            <a href="http://pkk5.rosreestr.ru" class="pull-right">rosreestr</a>
+        </p>
+    </div>
+</footer>
+
+
+<script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+<script src="http://osgis.github.io/assets/TileLayer.EsriRest.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.2.3/leaflet.draw.js"></script>
+<script src="{% static 'pkk/assets/proj4js.js' %}"></script>
+<script src="{% static 'pkk/assets/projCode/merc.js' %}"></script>
+<script src="{% static 'pkk/assets/projCode/tmerc.js' %}"></script>
+<script src="{% static 'pkk/assets/msk.js' %}"></script>
+<script src="{% static 'pkk/assets/msk2wgs.js' %}"></script>
+<script src="{% static 'pkk/js/rosreestr2coord.js' %}"></script>
+
+{% if AREA %}
+<script type="text/javascript">
+    var init_data = {{ AREA|safe }};
+    if (init_data) build(init_data);
+</script>
+{% endif %}
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-77433804-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>

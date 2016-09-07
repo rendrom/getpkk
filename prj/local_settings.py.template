@@ -1,0 +1,16 @@
+DEBUG = False
+
+ALLOWED_HOSTS = ['getpkk.ru']
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.contrib.gis.db.backends.postgis",
+        "NAME": "getpkk",
+        "USER": "postgres",
+        "PASSWORD": "",
+        "HOST": "127.0.0.1",
+        "PORT": "5432",
+    }
+}
+
+SECRET_KEY = '!f7pd_*8m++h-=44$kpwwa05ik&yqx%^a7k9^4*ubk^g6ox1)&'
