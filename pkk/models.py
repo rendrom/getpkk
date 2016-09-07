@@ -39,7 +39,7 @@ class Geom (models.Model):
     code = models.ForeignKey(Pkk, related_name="geoms")
     epsilon = models.FloatField('Точность аппроксимации')
 
-    geom = models.MultiPolygonField('Геометрия', null=True, blank=True, srid=3857)
+    geom = models.MultiPolygonField('Геометрия', null=True, blank=True)
 
     def __str__(self):
         return '%se%s' % (self.code, self.epsilon)
