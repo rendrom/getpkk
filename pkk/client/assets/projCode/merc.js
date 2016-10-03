@@ -16,8 +16,7 @@ ALGORITHM REFERENCES
     U.S. Geological Survey Professional Paper 1453 , United State Government
     Printing Office, Washington D.C., 1989.
 *******************************************************************************/
-
-
+import * as Proj4js from 'proj4'
 /**
   Initialize Transverse Mercator projection
 */

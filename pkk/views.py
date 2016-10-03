@@ -4,6 +4,7 @@ from django.contrib.gis.gdal import CoordTransform, SpatialReference
 from django.contrib.gis.geos import GEOSGeometry, Point
 from django.core.files import File
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.base import TemplateView
 
 from models import Geom, Pkk, Usage
@@ -19,9 +20,9 @@ class GetAreaView (TemplateView):
     def get_context_data(self, **kwargs):
         context = super(GetAreaView, self).get_context_data(**kwargs)
         code = kwargs.get('code')
+        area_type = kwargs.get('area_type', 1)
         if code:
-            print(code)
-            area = _get_area(code)
+            area = _get_area(self.request, code, area_type)
             context["AREA"] = json.dumps(area)
         return context
 
@@ -38,18 +39,22 @@ def _transform_xy_array(array, from_crs=3857, to_crs=4326):
     return coordinates
 
 
-def _get_area(code):
+def _get_area(request, code, area_type):
     split = code.split('e')
     code = split[0]
     code = code.replace('-', ':')
     epsilon = float(split[1] if len(split) > 1 else 5)
-    data = {"code": code}
+    area_type = int(area_type if area_type else 1)
+    data = {"code": code, "area_type": area_type}
     media_path = MEDIA_ROOT
     exist = False
+
     if code:
-        pkk = (Pkk.objects.filter(code=code) or [None])[0]
+        pkk = (Pkk.objects.filter(code=code, area_type=area_type) or [None])[0]
         if pkk:
-            area = Area(media_path)
+            exist = True
+            area = Area(media_path=media_path, area_type=area_type, epsilon=epsilon)
+            area.attrs = pkk.attrs
             area.image_path = pkk.image.path
             area.image_extent = pkk.image_extent
             area.center = pkk.center
@@ -57,8 +62,8 @@ def _get_area(code):
             area.height = pkk.height
             area.get_geometry("png")
         else:
-            pkk = Pkk(code=code)
-            area = Area(code, epsilon, media_path)
+            pkk = Pkk(code=code, area_type=area_type)
+            area = Area(code, area_type, epsilon, media_path)
 
         xy = area.get_coord()
         if len(xy) and len(xy[0]):
@@ -95,6 +100,8 @@ def _get_area(code):
                         geom = Geom(code=pkk, geom=poly, epsilon=epsilon)
                         geom.save()
                     usage = Usage(geom=geom)
+                    if request.user.is_authenticated():
+                        usage.user = request.user
                     usage.save()
 
                 except Exception as er:
@@ -103,5 +110,6 @@ def _get_area(code):
     return data
 
 
-def get_area(req, code):
-    return JsonResponse(_get_area(code))
+@csrf_exempt
+def get_area(req, code, area_type):
+    return JsonResponse(_get_area(req, code, area_type))

@@ -90,6 +90,7 @@ var startDraw = function () {
     map.on('draw:deletestop', onDrawDeleteStop);
     map.on('draw:editstop', onDrawEditStop);
 };
+
 var onDrawCreated = function (e) {
     var type = e.layerType,
         layer = e.layer;
@@ -574,9 +575,4 @@ var getJSON = function (opt) {
 helpBtn.onclick = function () {
     alert("Добавьте к кадастровому номеру e[ЧИСЛО] чтобы изменить количество распознаваемых узлов в полигоне. " +
         "Чем e больше, тем узлов меньше. Примеры: 38:06:144003:4723e0.8; 38:36:000021:1106e10")
-};
-
-
-var generateKml = function () {
-
 };

@@ -11,6 +11,7 @@ from django.utils import timezone
 @python_2_unicode_compatible
 class Pkk (models.Model):
     code = models.CharField('Номер', max_length=50, unique=True)
+    area_type = models.IntegerField('Тип участка', default=1)
     attrs = JSONField(blank=True, null=True)
 
     extent = JSONField(blank=True, null=True)
@@ -42,7 +43,7 @@ class Geom (models.Model):
     geom = models.MultiPolygonField('Геометрия', null=True, blank=True)
 
     def __str__(self):
-        return '%se%s' % (self.code, self.epsilon)
+        return '%s/%s' % (self.code.area_type, self.code)
 
     class Meta:
         unique_together = ("code", "epsilon")

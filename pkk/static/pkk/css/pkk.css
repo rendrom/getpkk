@@ -29,8 +29,8 @@ html, body, #result {
 #map {
     width: 100%
 }
-        
-#get-area{
+
+#get-area {
     width: 150px;
 }
 
@@ -43,13 +43,12 @@ html, body, #result {
 }
 
 /*#coord-select {*/
-    /*margin: 10px;*/
+/*margin: 10px;*/
 /*}*/
 
 /*.coord-options {*/
-    /*margin-right: 5px;*/
+/*margin-right: 5px;*/
 /*}*/
-
 
 #coord-options {
     margin: 10px;
@@ -105,6 +104,7 @@ html, body, #result {
     text-align: center;
     vertical-align: middle;
 }
+
 .div-ico-new {
     color: forestgreen;
     border-color: forestgreen;
@@ -157,20 +157,38 @@ html, body, #result {
     padding: 5px;
 }
 
-@media (max-width: 992px) { 
+#get-link .glyphicon {
+    line-height: 20px;
+}
+
+/*TYPE SELECT DROPDOWN*/
+
+#area-types-options {
+    z-index: 10000;
+}
+
+.type-selected {
+    padding-right: 3px;
+}
+
+@media (max-width: 992px) {
     #area-code-input, #get-area {
         height: 35px;
-        font-size: 16pt;                
+        font-size: 16pt;
     }
-    
+
+    #get-link .glyphicon {
+        line-height: 21px;
+    }
+
     #get-area {
-        line-height: 16pt;                
+        line-height: 16pt;
     }
-    
+
     .container {
         max-width: none;
     }
-    
+
     .map-container, .attr-container {
         height: 50%;
     }
