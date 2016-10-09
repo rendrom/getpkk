@@ -60,7 +60,7 @@ def _get_area(request, code, area_type):
             area.center = pkk.center
             area.width = pkk.width
             area.height = pkk.height
-            area.get_geometry("png")
+            area.get_geometry()
         else:
             pkk = Pkk(code=code, area_type=area_type)
             area = Area(code, area_type, epsilon, media_path)

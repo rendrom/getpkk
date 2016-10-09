@@ -267,7 +267,7 @@ class Area:
         ex = [ex["xmin"] - buf, ex["ymin"] - buf, ex["xmax"] + buf, ex["ymax"] + buf]
         return ex
 
-    def get_geometry(self, format="png"):
+    def get_geometry(self):
         """
         get corner geometry array from downloaded image
         [area1],[area2] - may be multipolygon geometry

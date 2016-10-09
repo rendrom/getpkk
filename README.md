@@ -21,7 +21,7 @@ Demonstration for [rosreestr2pkk](https://github.com/rendrom/rosreestr2coord) sc
     
     ./manage.py collectstatic --noinput # for prod
     
-    ./manage.py runserver # run dev server on localhost:8080
+    ./manage.py runserver # run dev server on localhost:8000
     
 ## Client side
 
