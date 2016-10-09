@@ -157,9 +157,10 @@ html, body, #result {
     padding: 5px;
 }
 
-#get-link .glyphicon {
+.main-btn .glyphicon {
     line-height: 20px;
 }
+
 
 /*TYPE SELECT DROPDOWN*/
 
@@ -177,7 +178,7 @@ html, body, #result {
         font-size: 16pt;
     }
 
-    #get-link .glyphicon {
+    .main-btn .glyphicon {
         line-height: 21px;
     }
 

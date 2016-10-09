@@ -9,7 +9,7 @@ from django.views.generic.base import TemplateView
 
 from models import Geom, Pkk, Usage
 from prj.settings import MEDIA_ROOT
-from rosreestr.rosreestr2coord import Area
+from rosreestr2coord.parser import Area
 
 import os
 
@@ -88,7 +88,7 @@ def _get_area(request, code, area_type):
                 pkk.save()
                 os.remove(area.image_path)
 
-            geojson_poly = area._to_geojson(type="polygon")
+            geojson_poly = area.to_geojson_poly()
             if geojson_poly:
                 try:
                     poly = GEOSGeometry(json.dumps(geojson_poly['features'][0]['geometry']), srid=3857)

@@ -7,6 +7,7 @@ import {getJSON} from '../services/Request'
 
 import Mapster from '../services/Mapster'
 import {AreaTypes} from "./page-builder";
+import {serializeUrlParam} from "../utils";
 
 
 let mapster = new Mapster('map');
@@ -21,6 +22,9 @@ let coordsList = document.getElementById("coords-list");
 let infoBlock = document.getElementById("info");
 let btnDefVal = goBtn.innerHTML;
 let getLink = document.getElementById("get-link");
+let mapClickModeBtn = document.getElementById("map-click-mode");
+
+let mapClickModeOn = false;
 
 let types = new AreaTypes();
 
@@ -63,13 +67,16 @@ let options = {
 let drawControl = new L.Control.Draw(options);
 
 let startLoading = function () {
+    clear();
     stopDraw();
     goBtn.innerHTML = "Загрузка...";
     goBtn.classList.add("disabled");
+    map._container.style.cursor = "wait";
 };
 let stopLoading = function () {
     goBtn.innerHTML = btnDefVal;
     goBtn.classList.remove("disabled");
+    setMapCursor();
 };
 
 let stopDraw = function () {
@@ -528,12 +535,18 @@ goBtn.onclick = function () {
         alert("Введите кадастровый номер");
         return;
     }
-    clear();
+    getAreaByCode(code);
+
+};
+
+let getAreaByCode = function (code) {
+
     startLoading();
 
     if (code) {
         getJSON(`/get/${code}/${types.type}`, {method: "POST"})
             .then(data => {
+                input.value = code;
                 build(data);
                 stopLoading();
             })
@@ -546,11 +559,56 @@ goBtn.onclick = function () {
 };
 
 getLink.onclick = function () {
+    getLink.blur();
     if (code) {
         alert(`http://getpkk.ru/${types.type || 1}/${code}`);
     } else {
         alert("Введите кадастровый номер");
     }
+};
+
+mapClickModeBtn.onclick = function () {
+    mapClickModeOn = !mapClickModeOn;
+    mapClickModeBtn.blur();
+    if (mapClickModeOn) {
+        mapClickModeBtn.classList.add("active");
+        map.on("click", onMapClickModeBtnClick, this);
+        setMapCursor();
+    } else {
+        mapClickModeBtn.classList.remove("active");
+        map.off("click", onMapClickModeBtnClick, this);
+        setMapCursor();
+    }
+
+};
+
+let setMapCursor = function () {
+    map._container.style.cursor = mapClickModeOn ? "crosshair" : "";
+};
+
+let onMapClickModeBtnClick = function (e) {
+    getAreaFromLatLng(e.latlng);
+};
+
+let getAreaFromLatLng = function (latlng) {
+    let urlStr = serializeUrlParam({
+        text: [latlng.lat, latlng.lng].join(","),
+        tolerance: 1
+    });
+    startLoading();
+    return getJSON(`http://pkk5.rosreestr.ru/api/features?${urlStr}`).then((data) => {
+        stopLoading();
+        if (data && data.features) {
+            let pkkFeature = data.features.find((obj) => {
+                return (obj.attrs && obj.attrs.cn && obj.attrs.cn.split(":").length === 4)
+            });
+            if (pkkFeature && pkkFeature.center) {
+                getAreaByCode(pkkFeature.attrs.cn);
+            }
+        }
+    }).catch(()=> {
+        startLoading();
+    })
 };
 
 

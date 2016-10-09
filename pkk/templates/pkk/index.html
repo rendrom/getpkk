@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.2.3/images/spritesheet-2x.png"/>
 
 
-    <link rel="shortcut icon" type="image/png" href="{% static 'pkk/favicon.ico' %}"/>
+    <link rel="icon" type="image/png" href="{% static 'pkk/favicon.ico' %}"/>
 
     <link rel="stylesheet" href="{% static 'pkk/css/pkk.css' %}"/>
 
@@ -34,7 +34,9 @@
             <input id="area-code-input" type="text" class="form-control" placeholder="Кадастровый номер">
 
             <span class="input-group-btn">
-                <button id="get-link" class="btn btn-default" type="button" aria-label="Help"><span
+                <button id="map-click-mode" class="btn btn-default main-btn" type="button" aria-label="Map click mode"><span
+                        class="glyphicon glyphicon-screenshot" aria-hidden="true"></span></button>
+                <button id="get-link" class="btn btn-default main-btn" type="button" aria-label="Help"><span
                         class="glyphicon glyphicon-link" aria-hidden="true"></span></button>
                 <button id="get-area" class="btn btn-default" type="button">Вперёд</button>
             </span>
