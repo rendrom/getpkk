@@ -13,6 +13,8 @@ from rosreestr2coord.parser import Area
 
 import os
 
+from rosreestr2coord.scripts.export import coords2geojson
+
 
 class GetAreaView (TemplateView):
     template_name = 'pkk/index.html'
@@ -91,7 +93,8 @@ def _get_area(request, code, area_type):
             geojson_poly = area.to_geojson_poly()
             if geojson_poly:
                 try:
-                    poly = GEOSGeometry(json.dumps(geojson_poly['features'][0]['geometry']), srid=3857)
+                    geometry = coords2geojson(area.get_coord(), "polygon", area.coord_out)
+                    poly = GEOSGeometry(json.dumps(geometry['features'][0]['geometry']), srid=3857)
                     poly.transform(4326)
                     data["kml"] = poly.kml
 

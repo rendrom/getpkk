@@ -62,12 +62,12 @@ def area_json_output(output, area):
         f.close()
 
 
-def coords2geojson(coords, geom_type, coord):
+def coords2geojson(coords, geom_type, crs_name):
     if coords:
         features = []
         feature_collection = {
             "type": "FeatureCollection",
-            "crs": {"type": "name", "properties": {"name": coord}},
+            "crs": {"type": "name", "properties": {"name": crs_name}},
             "features": features
         }
         if geom_type.upper() == "POINT":
