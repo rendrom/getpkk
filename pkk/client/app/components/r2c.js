@@ -179,7 +179,7 @@ let createHoleMarkers = function (coords) {
 };
 
 let getMarkers = function () {
-    return featureGroup.getLayers().map(function (p) {
+    return featureGroup.getLayers().filter(p => p.getLatLng).map((p) => {
         return {
             x: p.getLatLng().lng,
             y: p.getLatLng().lat,
@@ -304,13 +304,13 @@ let calculateGzn = function (x1, y1, x2, y2, num, prevNum) {
     };
     let gzn = Math.PI - Math.PI * sgn(sgn(x) + 1) * sgn(y) + Math.atan(y / x);
     let classicGzn = checkGzn(x, y);
-    if (gzn !== classicGzn) {
-        console.warn("Ошибка вычисление азимута для " + prevNum + "-" + num + ":");
-        console.log("x1: " + x1 + "; y1: " + y1 + "; x2: " + x2 + "; y2: " + y2);
-        console.log("dx: " + x + "; dy: " + y);
-        console.log("По формуле А =PI-PI*sgn(sgn(X)+1)*sgn(Y)+arctg(Y/X) =" + gzn);
-        console.log("Классическое вычисление = " + classicGzn);
-    }
+    // if (gzn !== classicGzn) {
+    //     console.warn("Ошибка вычисление азимута для " + prevNum + "-" + num + ":");
+    //     console.log("x1: " + x1 + "; y1: " + y1 + "; x2: " + x2 + "; y2: " + y2);
+    //     console.log("dx: " + x + "; dy: " + y);
+    //     console.log("По формуле А =PI-PI*sgn(sgn(X)+1)*sgn(Y)+arctg(Y/X) =" + gzn);
+    //     console.log("Классическое вычисление = " + classicGzn);
+    // }
     return gzn * (180 / Math.PI);
 };
 
@@ -356,18 +356,32 @@ let build = function (data) {
         //         '38:36:000021:1106e10');
         //     return;
         // }
-        let coords = data.coordinates;
-        buildArea(coords);
-        // exclude closing point
-        if (data.holes) {
-            for (let f = 0; f < data.holes.length; f++) {
-                buildArea(data.holes[f], "hole");
-            }
+        if (data.geojson) {
+            let feature = JSON.parse(data.geojson);
+            L.geoJSON(feature.features, {
+                style: {
+                    fillColor: "#2f4f50",
+                    color: "#2f4f50",
+                    weight: 1,
+                    opacity: 1,
+                    fillOpacity: 0.3
+                }
+            }).addTo(featureGroup);
         }
+        let coords = data.coordinates;
+        coords.forEach((c) => {
+            buildArea(c[0]);
+            // exclude closing point
+            let holes = c.slice(1, c.length);
+            holes.forEach((h) => {
+                buildArea(h, "hole");
+            });
+
+        });
         // map.fitBounds(featureGroup.getBounds());
         map.flyToBounds(featureGroup.getBounds());
-        startDraw();
         showCoordList();
+        startDraw();
     }
 };
 

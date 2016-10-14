@@ -1,3 +1,4 @@
+import copy
 import json
 
 from django.contrib.gis.gdal import CoordTransform, SpatialReference
@@ -13,7 +14,7 @@ from rosreestr2coord.parser import Area
 
 import os
 
-from rosreestr2coord.scripts.export import coords2geojson
+from rosreestr2coord.export import coords2geojson
 
 
 class GetAreaView (TemplateView):
@@ -69,12 +70,12 @@ def _get_area(request, code, area_type):
 
         xy = area.get_coord()
         if len(xy) and len(xy[0]):
-            coordinates = _transform_xy_array(xy[0][0])
-            data["coordinates"] = coordinates
+            data["coordinates"] = copy.deepcopy(xy)
+            for geom in data["coordinates"]:
+                for p in range(len(geom)):
+                    geom[p] = _transform_xy_array(geom[p])
             if area.center:
                 data["center_pkk"] = area.center
-            if len(xy[0]) > 0:
-                data["holes"] = [_transform_xy_array(xy_hole) for xy_hole in xy[0][1:]]
             attrs = area.get_attrs()
             if attrs:
                 pkk.attrs = attrs
@@ -90,7 +91,8 @@ def _get_area(request, code, area_type):
                 pkk.save()
                 os.remove(area.image_path)
 
-            geojson_poly = area.to_geojson_poly()
+            # geojson_poly = area.to_geojson_poly()
+            geojson_poly = coords2geojson(data["coordinates"], "polygon", area.coord_out)
             if geojson_poly:
                 try:
                     geometry = coords2geojson(area.get_coord(), "polygon", area.coord_out)
