@@ -23,6 +23,7 @@ class Pkk (models.Model):
     create_date = models.DateTimeField('Дата создания', default=timezone.now)
     change_date = models.DateTimeField('Дата обновления', default=timezone.now)
     image = models.ImageField('Изображение', upload_to='pkk', blank=True, null=True)
+    image_version = models.CharField('Версия изображения', default="0.0.0", max_length=10)
 
     lon = models.FloatField('Долгота', blank=True, null=True)
     lat = models.FloatField('Широта', blank=True, null=True)

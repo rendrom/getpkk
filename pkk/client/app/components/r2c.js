@@ -413,8 +413,7 @@ let prepare = function (data) {
         let link = document.createElement("a");
         let linkText = document.createTextNode("На сайте PKK");
         link.className = "info-item link";
-        pkk_url = "http://pkk5.rosreestr.ru/#x=" + c.x + "&y=" + c.y + "&text=" + data.code
-            + "&app=search&opened=1";
+        pkk_url = `http://pkk5.rosreestr.ru/#x=${c.x}&y=${c.y}&text=${data.code}&app=search&opened=1`;
         link.setAttribute('href', pkk_url);
         link.setAttribute('target', "_blank");
         link.appendChild(linkText);
@@ -424,17 +423,17 @@ let prepare = function (data) {
     let filename, pom;
     let name = data.code.replace(/:/g, "-");
     if (data.kml) {
-        let kmldata = '<?xml version="1.0" encoding="utf-8" ?>' +
-            '<kml xmlns="http://www.opengis.net/kml/2.2"><Document id="root_doc">' +
-            '<Style id="default0"><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>' +
-            '<Placemark>' +
-            '<description><![CDATA[' +
-            ( address ? address + '<br>' : "" ) +
-            '<a href="http://geonote.ru/pkk/' + name + '">Координаты</a>' +
-            ( pkk_url ? ', <a href="' + pkk_url + '">PKK</a>' : "") +
-            ']]></description>' +
-            '<name>' + data.code + '</name>' + '<styleUrl>#default0</styleUrl>' + data.kml +
-            '</Placemark></Document></kml>';
+        let kmldata = `<?xml version="1.0" encoding="utf-8" ?>
+            <kml xmlns="http://www.opengis.net/kml/2.2"><Document id="root_doc">
+            <Style id="default0">
+                <LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+            <Placemark>
+            <description><![CDATA[
+                ${ address ? address + '<br>' : "" }
+                <a href="http://getpkk.ru/${name}">Координаты</a>
+                ${pkk_url ? `, <a href="${pkk_url}">PKK</a>` : ``}
+            ]]></description>
+            <name>${data.code}</name><styleUrl>#default0</styleUrl>${data.kml}</Placemark></Document></kml>`;
         filename = name + ".kml";
         pom = createBlob(filename, kmldata, "Kml", "info-item link kml-link");
         infoBlock.appendChild(pom);

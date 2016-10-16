@@ -10,6 +10,7 @@ from django.views.generic.base import TemplateView
 
 from models import Geom, Pkk, Usage
 from prj.settings import MEDIA_ROOT
+from rosreestr2coord.merge_tiles import VERSION
 from rosreestr2coord.parser import Area
 
 import os
@@ -51,11 +52,13 @@ def _get_area(request, code, area_type):
     data = {"code": code, "area_type": area_type}
     media_path = MEDIA_ROOT
     exist = False
+    image_version = VERSION
 
     if code:
         pkk = (Pkk.objects.filter(code=code, area_type=area_type) or [None])[0]
-        if pkk:
+        if pkk and pkk.image_version == image_version:
             exist = True
+
             area = Area(media_path=media_path, area_type=area_type, epsilon=epsilon)
             area.attrs = pkk.attrs
             area.image_path = pkk.image.path
@@ -64,8 +67,10 @@ def _get_area(request, code, area_type):
             area.width = pkk.width
             area.height = pkk.height
             area.get_geometry()
+
         else:
-            pkk = Pkk(code=code, area_type=area_type)
+            pkk = pkk or Pkk(code=code, area_type=area_type)
+            pkk.image_version = image_version
             area = Area(code, area_type, epsilon, media_path)
 
         xy = area.get_coord()
