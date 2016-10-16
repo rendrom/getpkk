@@ -135,7 +135,7 @@ class Area:
             for f in formats:
                 image = None
                 try:
-                    image = PkkAreaMerger(bbox=self.get_buffer_extent_list(), output_format=f, with_log=with_log,
+                    image = PkkAreaMerger(bbox=self.get_buffer_extent_list(), output_format=f, with_log=True,
                                           clear_code=self.clear_code(self.code_id), output_dir=tmp_dir)
                     image.download()
                     self.image_path = image.merge_tiles()
