@@ -2,11 +2,12 @@
 from __future__ import print_function, unicode_literals, division
 
 import json
-from itertools import chain, product
 import math
+import os
 import random
 import threading
-import os
+from itertools import chain, product
+
 from PIL import Image
 
 try:
@@ -18,7 +19,7 @@ except ImportError:  # For Python 3
     from urllib.parse import urlencode
     from queue import Queue
 
-from utils import make_request
+from scripts.utils import make_request
 
 VERSION = "1.0.0"
 
@@ -133,7 +134,7 @@ class TileMerger:
                     url = self.get_url(x, y, self.zoom)
                     tile = make_request(url)
                     if tile:
-                        self.write_image(tile.read(), file_path)
+                        self.write_image(tile, file_path)
                         self.count += 1
                 else:
                     self.count += 1
@@ -278,7 +279,7 @@ class BingMerger(TileMerger, object):
 
 
 class GoogleMerger(UrlTileMerger):
-    url = "http://khm0.googleapis.com/kh?v=173&x={x}&y={y}&z={z}"
+    url = "http://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"  # "http://khm0.googleapis.com/kh?v=173&x={x}&y={y}&z={z}"
     file_name_prefix = 'google'
     crs = 3857
 
@@ -292,17 +293,10 @@ class PkkAreaMerger(TileMerger, object):
     crs = 3857
     tile_size = (2000, 2000)
     use_cache = False
-    max_tiles = 20
 
     def __init__(self, output_format, clear_code, **kwargs):
         super(PkkAreaMerger, self).__init__(zoom=0, tile_format='.%s' % output_format,
                                             file_name_prefix=clear_code, **kwargs)
-        # TODO: create clever limit
-        if self.total > self.max_tiles:
-            diff = math.ceil(int(self.total / self.max_tiles))
-            self.tile_size = map(lambda x: math.ceil(x*(diff/4)), self.tile_size)
-            self.total = self.calc_total()
-
         self.file_name_prefix = clear_code.replace(":", "_")
         self.output_format = output_format
         self.clear_code = clear_code
@@ -385,7 +379,7 @@ class PkkAreaMerger(TileMerger, object):
             if meta_url:
                 try:
                     response = make_request(meta_url)
-                    read = response.read()
+                    read = response
                     data = json.loads(read)
                     if data.get("href"):
                         self._image_extent_list.append(data.get("extent"))
@@ -425,10 +419,7 @@ class PkkAreaMerger(TileMerger, object):
             bb = self.bbox
             xmax = max([x["xmax"] for x in self._image_extent_list])
             ymax = max([x["ymax"] for x in self._image_extent_list])
-            xmin = min([x["xmin"] for x in self._image_extent_list])
-            ymin = min([x["ymin"] for x in self._image_extent_list])
-            self.image_extent = {"xmin": xmin, "ymin": ymin, "xmax": xmax, "ymax": ymax}
-
+            self.image_extent = {"xmin": bb[0], "ymin": bb[1], "xmax": xmax, "ymax": ymax}
             out = Image.new('RGB', (self.real_width, self.real_height))
             for t in tiles:
                 out.paste(t[0], t[1])

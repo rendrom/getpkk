@@ -9,7 +9,7 @@ import os
 
 from catalog import Catalog
 from export import coords2geojson
-from merge_tiles import PkkAreaMerger
+from scripts.merge_tiles import PkkAreaMerger
 from utils import xy2lonlat, make_request
 
 try:
@@ -19,7 +19,7 @@ except ImportError:  # For Python 3
     import urllib.parse as urlparse
     from urllib.parse import urlencode
 
-VERSION = "1.1.3"
+VERSION = "1.2.0"
 
 ##############
 # SEARCH URL #
@@ -135,7 +135,7 @@ class Area:
             for f in formats:
                 image = None
                 try:
-                    image = PkkAreaMerger(bbox=self.get_buffer_extent_list(), output_format=f, with_log=True,
+                    image = PkkAreaMerger(bbox=self.get_buffer_extent_list(), output_format=f, with_log=with_log,
                                           clear_code=self.clear_code(self.code_id), output_dir=tmp_dir)
                     image.download()
                     self.image_path = image.merge_tiles()
@@ -185,7 +185,7 @@ class Area:
             search_url = self.feature_info_url + self.clear_code(self.code)
             self.log("Start downloading area info: %s" % search_url)
             response = make_request(search_url)
-            resp = response.read()
+            resp = response
             data = json.loads(resp)
             if data:
                 feature = data.get("feature")
